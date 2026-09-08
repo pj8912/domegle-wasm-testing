@@ -1,0 +1,14 @@
+{
+  "name": "domegle-wasm",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "cargo build --target=wasm32-unknown-unknown && wasm-bindgen ./target/wasm32-unknown-unknown/debug/domegle_wasm.wasm --out-dir=public/wasm --weak-refs --target=web --debug",
+    "build:release": "cargo build --target=wasm32-unknown-unknown --release && wasm-bindgen ./target/wasm32-unknown-unknown/release/domegle_wasm.wasm --out-dir=public/wasm --weak-refs --target=web",
+    "serve": "http-server --cors -a 127.0.0.1 -p 7500 -c-1 public/"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}

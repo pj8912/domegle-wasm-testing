@@ -1,0 +1,23 @@
+# Rust build output
+target/
+
+# JavaScript dependencies
+node_modules/
+
+# Generated WebAssembly bundles (created by npm run build*)
+public/wasm/
+public/wasm-release/
+
+# Local environment and editor settings
+.env
+.env.*
+!.env.example
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS-generated files
+.DS_Store
+Thumbs.db

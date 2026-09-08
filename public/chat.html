@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Domegle</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="dot"></span>
+      <h1>Domegle</h1>
+    </div>
+    <div class="topbar-right">
+      <span class="stat"><strong id="peerCount">0</strong> <i class="bi bi-people" style="
+font-size:15px;font-weight: bold;"></i></span>
+      <span class="stat mono" id="nodeId" title="Your endpoint id"></span>
+
+      <button class="theme-toggle" id="themeToggle" type="button" role="switch" aria-checked="true" aria-label="Toggle light and dark mode">
+        <span class="theme-toggle-track">
+          <span class="theme-toggle-icon theme-toggle-icon--sun" aria-hidden="true">&#9728;</span>
+          <span class="theme-toggle-icon theme-toggle-icon--moon" aria-hidden="true">&#9789;</span>
+          <span class="theme-toggle-knob"></span>
+        </span>
+    </button>
+
+      <button class="ghost" id="settingsBtn" type="button"><i class="bi bi-gear"></i> Settings</button>
+    </div>
+  </header>
+
+  <main class="stage" id="stage">
+    <section class="video-area">
+      <div class="video-wrap">
+        <video id="remoteVideo" autoplay playsinline></video>
+        <div class="overlay" id="remoteOverlay">
+          <div class="overlay-inner">
+            <div class="spinner" id="spinner" hidden></div>
+            <p class="overlay-title" id="overlayTitle">Starting up</p>
+            <p class="overlay-sub" id="overlaySub">Binding an iroh endpoint in this tab.</p>
+          </div>
+        </div>
+        <video id="localVideo" autoplay playsinline muted></video>
+        <div class="badge" id="connBadge" hidden></div>
+      </div>
+
+      <div class="controls">
+        <button class="primary" id="startBtn" type="button" disabled>Start</button>
+        <button class="secondary" id="nextBtn" type="button" disabled>Next <kbd>Esc</kbd></button>
+        <button class="danger" id="stopBtn" type="button" disabled><i class="bi bi-stop-circle"></i> Stop</button>
+        <span class="spacer"></span>
+        <button class="toggle" id="micBtn" type="button" aria-pressed="true"><i class="bi bi-mic"></i> Mic on</button>
+        <button class="toggle" id="camBtn" type="button" aria-pressed="true"><i class="bi bi-camera-video"></i> Camera on</button>
+      </div>
+    </section>
+
+    <section class="chat">
+      <div class="chat-head">
+        <span id="peerName">No stranger yet</span>
+        <span class="mono muted" id="peerId"></span>
+      </div>
+      <div class="messages" id="messages"></div>
+      <div class="typing" id="typing" hidden>stranger is typing...</div>
+      <form class="composer" id="composer" autocomplete="off">
+        <input id="input" type="text" placeholder="Say something..." maxlength="2000" disabled />
+        <button class="primary" id="sendBtn" type="submit" disabled><i class="bi bi-send"></i> Send</button>
+      </form>
+    </section>
+  </main>
+
+  <!-- Shown whenever this profile has more than one Domegle tab open. -->
+  <div class="blocker" id="blocker" hidden>
+    <div class="blocker-card">
+      <h2>Domegle is open in another tab</h2>
+      <p>
+        This app runs one peer-to-peer node per browser, so it only works in a
+        single tab. It has stopped in <strong>every</strong> open tab, including
+        this one.
+      </p>
+      <p class="muted">
+        Close all but one Domegle tab. The one you keep starts again on its own -
+        no reload needed.
+      </p>
+      <div class="blocker-status" id="blockerStatus">Waiting for the other tab to close...</div>
+    </div>
+  </div>
+
+  <dialog id="settings">
+    <form method="dialog" class="settings-body">
+      <h2>Settings</h2>
+
+      <label for="nickInput">Display name</label>
+      <input id="nickInput" type="text" maxlength="32" placeholder="stranger" />
+
+      <label for="ticketOut">Your ticket <span class="muted">(share it so others can find you)</span></label>
+      <textarea id="ticketOut" rows="3" readonly></textarea>
+      <button class="secondary" id="copyTicket" type="button">Copy ticket</button>
+
+      <label for="seedInput">Add a bootstrap ticket</label>
+      <input id="seedInput" type="text" placeholder="endpoint..." />
+      <button class="secondary" id="addSeed" type="button">Add seed</button>
+
+      <label>Node log</label>
+      <div class="log mono" id="log"></div>
+
+      <menu>
+        <button class="primary" value="close">Close</button>
+      </menu>
+    </form>
+  </dialog>
+
+<script>
+    // Theme handling only — independent of the iroh/wasm networking in app.js.
+    (function () {
+      var root = document.documentElement;
+      var stored = null;
+      try { stored = localStorage.getItem('domegle-theme'); } catch (e) {}
+      if (stored === 'light' || stored === 'dark') root.setAttribute('data-theme', stored);
+
+      var btn = document.getElementById('themeToggle');
+      function sync() {
+        var isDark = root.getAttribute('data-theme') !== 'light';
+        btn.setAttribute('aria-checked', String(isDark));
+      }
+      sync();
+      btn.addEventListener('click', function () {
+        var next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+        root.setAttribute('data-theme', next);
+        try { localStorage.setItem('domegle-theme', next); } catch (e) {}
+        sync();
+      });
+    })();
+  </script>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
