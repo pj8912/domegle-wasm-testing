@@ -1,3 +1,18 @@
+/*
+ * Domegle in the browser.
+ *
+ *   this tab (wasm iroh node)  --QUIC over a relay-->  stranger's node
+ *                              \__ SDP + ICE + fallback chat __/
+ *              media and low-latency chat: WebRTC, peer to peer
+ *
+ * The iroh endpoint lives inside the WebAssembly module in this very tab. There
+ * is no signalling server: the handshake rides the same encrypted iroh stream
+ * that discovery uses. Browsers cannot send UDP, so iroh traffic is relayed -
+ * the relay cannot read it.
+ *
+ * Exactly one tab may run this. See tabguard.js.
+ */
+
 import init, { DomegleNode } from './wasm/domegle_wasm.js';
 import { TabGuard } from './tabguard.js';
 
@@ -39,6 +54,8 @@ const ui = {
   log: el('log'),
 };
 
+// stun3.l.google.com:19302,
+// stun4.l.google.com:19302,
 
 const ICE_SERVERS = [
   { urls: ['stun:stun.l.google.com:19302'] },
@@ -256,6 +273,9 @@ function applyTrackToggles() {
   state.localStream.getAudioTracks().forEach((track) => (track.enabled = state.micOn));
   state.localStream.getVideoTracks().forEach((track) => (track.enabled = state.camOn));
   
+  // ui.micBtn.textContent = state.micOn ? 'Mic on' : 'Mic off';
+  // ui.camBtn.textContent = state.camOn ? 'Camera on' : 'Camera off';
+
   ui.micBtn.innerHTML = state.micOn ? '<i class="bi bi-mic"></i> Mic on' : '<i class="bi bi-mic-mute"></i> Mic off';
   ui.camBtn.innerHTML = state.camOn ? '<i class="bi bi-camera-video"></i> Camera on' : '<i class="bi bi-camera-video-off"></i> Camera off';
   ui.micBtn.setAttribute('aria-pressed', String(state.micOn));
@@ -431,7 +451,7 @@ function onEnded(reason) {
   refreshControls();
 }
 
-/*  ui  */
+/*  ui --- */
 
 function setDot(kind) {
   ui.dot.className = `dot ${kind}`.trim();
@@ -502,7 +522,7 @@ function appendLog(text, level) {
   ui.log.scrollTop = ui.log.scrollHeight;
 }
 
-/*  actions  */
+/*  actions --- */
 
 async function start() {
   if (!state.node) return;
@@ -552,7 +572,7 @@ function sendTyping(on) {
   }
 }
 
-/*  wiring  */
+/* --------------------------------------------------------------- wiring --- */
 
 ui.startBtn.addEventListener('click', start);
 ui.nextBtn.addEventListener('click', next);

@@ -1,3 +1,19 @@
+/*
+ * Single-tab enforcement.
+ *
+ * Domegle runs one iroh endpoint per browser profile: a second tab would bind a
+ * second endpoint on the same identity, announce itself into the same swarm and
+ * compete for the same strangers. So the rule is one tab, full stop.
+ *
+ * When a second tab appears, *every* tab stops the app and shows the same
+ * "close one of these tabs" screen. Whichever tab survives detects that it is
+ * alone again and starts the app itself - no reload needed.
+ *
+ * Detection is a BroadcastChannel heartbeat rather than a lock, because it has
+ * to survive a tab that crashed without saying goodbye: peers that stop pinging
+ * age out after PEER_TIMEOUT.
+ */
+
 const CHANNEL = 'domegle-tabs';
 const PING_INTERVAL = 700;
 const PEER_TIMEOUT = 2200;
